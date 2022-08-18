@@ -109,7 +109,7 @@ const Home = ({ singleBookData, setSingleBookData }) => {
  // function for rendering table
   const renderTable = () => {
     if(isLoading){
-      return <CircularProgress sx={{marginTop:'3rem'}} /> 
+      return <CircularProgress sx={{marginTop:'3rem',color:'#2b6777'}} /> 
     }
     else{
       if(booksData["query"] ){
