@@ -48,6 +48,7 @@ const Home = ({ singleBookData, setSingleBookData }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user.loginUserData); // getting data from redux store
   const navigate = useNavigate();
+  const [isLoading,setIsLoading] = useState(null);
   const [search, setSearch] = useState("");
   const [booksData, setBooksData] = useState(
     JSON.parse(localStorage.getItem("booksData")) || []
@@ -55,13 +56,20 @@ const Home = ({ singleBookData, setSingleBookData }) => {
 
   // function for fetching data from api endpoint
   const booksDataFetch = async (bookName) => {
-    const response = await fetch(
-      `https://v1.nocodeapi.com/umar234/gr/vqtDNqNWbnVPMtpD/search?q=${bookName}`
-    );
-    const data = await response.json();
-    console.log(data);
-    setBooksData(data);
-    localStorage.setItem("booksData", JSON.stringify(data)); // saving data to local storage
+    try{
+      setIsLoading(true);
+      const response = await fetch(
+        `https://v1.nocodeapi.com/umar234/gr/vqtDNqNWbnVPMtpD/search?q=${bookName}`
+      );
+      const data = await response.json();
+      setIsLoading(false);
+      console.log(data);
+      setBooksData(data);
+      localStorage.setItem("booksData", JSON.stringify(data)); // saving data to local storage
+    }
+    catch(err){
+      alert('Something Went Wrong');
+    }
   };
 
   // onSearch function
@@ -98,6 +106,95 @@ const Home = ({ singleBookData, setSingleBookData }) => {
     setSingleBookData(booksData.results[index]);
     navigate("/singleBookData");
   };
+ // function for rendering table
+  const renderTable = () => {
+    if(isLoading){
+      return <CircularProgress sx={{marginTop:'3rem'}} /> 
+    }
+    else{
+      if(booksData["query"] ){
+        return (
+          <>
+          <Button
+                onClick={onClearHandler}
+                sx={{
+                  bgcolor: "#2b6777",
+                  height: "2.3rem",
+                  width: "10rem",
+                  mx: "1rem",
+                  my: "1rem",
+                  "&:hover": { bgcolor: "#52ab90" },
+                }}
+                variant="contained"
+              >
+                Clear
+              </Button>
+              <Typography
+                sx={{ fontSize: { sm: "1.8rem", xs: "1.4rem" } }}
+                my={2}
+                color="#2b6777"
+                variant="h4"
+              >
+                Search Results for {booksData.query}
+              </Typography>
+              <TableContainer
+                sx={{
+                  width: { sm: "70rem", xs: "23rem" },
+                  padding: { sm: "5rem", xs: "1rem" },
+                  bgcolor: "#c8d8e4",
+                }}
+                component={Paper}
+              >
+                <Table sx={{ Width: 450 }} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontSize: { sm: "1rem", xs: "0.8rem" } }}>
+                        Sr. No#
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontSize: { sm: "1.5rem", xs: "1.1rem" } }}
+                        align="left"
+                      >
+                        Book Name
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {booksData.results?.map((book, index) => (
+                      <TableRow
+                        key={index}
+                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      >
+                        <TableCell color="#2b6777" component="th" scope="row">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography
+                            color="#2b6777"
+                            sx={{
+                              cursor: "pointer",
+                              fontSize: { sm: "1.2rem", xs: "1rem" },
+                            }}
+                            align="left"
+                            pt={2}
+                            variant="h5"
+                            component="h2"
+                            key={index}
+                            onClick={() => singleBookDataHandler(index)}
+                          >
+                            {book.title}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+          </>
+        )
+      }
+    }
+  }
 
   // this useEffect is used for functionality that access of home page is  blocked until user Logins..
 
@@ -184,87 +281,9 @@ const Home = ({ singleBookData, setSingleBookData }) => {
           <ToastContainer />
         </Box>
 
-        {booksData["query"] ? (
-          <>
-            <Button
-              onClick={onClearHandler}
-              sx={{
-                bgcolor: "#2b6777",
-                height: "2.3rem",
-                width: "10rem",
-                mx: "1rem",
-                my: "1rem",
-                "&:hover": { bgcolor: "#52ab90" },
-              }}
-              variant="contained"
-            >
-              Clear
-            </Button>
-            <Typography
-              sx={{ fontSize: { sm: "1.8rem", xs: "1.4rem" } }}
-              my={2}
-              color="#2b6777"
-              variant="h4"
-            >
-              Search Results for {booksData.query}
-            </Typography>
-            <TableContainer
-              sx={{
-                width: { sm: "70rem", xs: "23rem" },
-                padding: { sm: "5rem", xs: "1rem" },
-                bgcolor: "#c8d8e4",
-              }}
-              component={Paper}
-            >
-              <Table sx={{ Width: 450 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontSize: { sm: "1rem", xs: "0.8rem" } }}>
-                      Sr. No#
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontSize: { sm: "1.5rem", xs: "1.1rem" } }}
-                      align="left"
-                    >
-                      Book Name
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {booksData.results?.map((book, index) => (
-                    <TableRow
-                      key={index}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell color="#2b6777" component="th" scope="row">
-                        {index + 1}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography
-                          color="#2b6777"
-                          sx={{
-                            cursor: "pointer",
-                            fontSize: { sm: "1.2rem", xs: "1rem" },
-                          }}
-                          align="left"
-                          pt={2}
-                          variant="h5"
-                          component="h2"
-                          key={index}
-                          onClick={() => singleBookDataHandler(index)}
-                        >
-                          {book.title}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
-        ) : (
-          <h1></h1>
-        )}
+        {
+          renderTable()
+        }
       </Box>
 
       <Box
