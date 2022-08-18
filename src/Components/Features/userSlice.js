@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
+// getting data from localstorage
 const getData = () => {
     if (localStorage.getItem("userData")) {
         return JSON.parse(localStorage.getItem("userData"));
@@ -8,6 +10,7 @@ const getData = () => {
         return [];
     }
 }
+// getting loginUserdata form local storage
 const getLoginUserData = () => {
     if (localStorage.getItem("loginUserData")) {
         return JSON.parse(localStorage.getItem("loginUserData"));
@@ -17,6 +20,7 @@ const getLoginUserData = () => {
     }
 }
 
+// user slice
 export const userSlice = new createSlice({
     name: 'user',
     initialState:{

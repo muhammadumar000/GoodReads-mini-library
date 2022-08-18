@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from "react";
+// mui imports
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { ToastContainer, toast } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
+// react toastify imports
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import { setEmail, setPassword, setUserData, setUserName,setLocalStorage } from "../Features/userSlice";
+// redux imports
+import {
+  setEmail,
+  setPassword,
+  setUserData,
+  setUserName,
+  setLocalStorage,
+} from "../Features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import {useNavigate} from 'react-router-dom';
 
+// react router imports
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-
+// copyright component
 function Copyright(props) {
   return (
     <Typography
@@ -31,7 +41,7 @@ function Copyright(props) {
       {...props}
     >
       {"Copyright © "}
-      {'GoodReads Mini Library '}
+      {"GoodReads Mini Library "}
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -41,69 +51,39 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [getData, setGetData] = useState([]);
   const navigate = useNavigate();
-
+  
+  //  duplicate check if user enter the email that is already in the storage
   const duplicateCheck = () => {
-    const duplicate = getData.filter(item => item.email === userEmail);
+    const duplicate = getData.filter((item) => item.email === userEmail);
     if (duplicate.length > 0) {
       return true;
+    } else {
+      return false;
     }
-    else{
-        return false;
-    }
-  }
-
+  };
+  
+  // onSubmit 
   const submitHandler = () => {
-   
-    if(name && userEmail && userPassword){
-      if(!duplicateCheck()){
-            dispatch(setUserName(name));
-            dispatch(setEmail(userEmail));
-            dispatch(setPassword(userPassword));
-            dispatch(setUserData());
-            dispatch(setLocalStorage());
-            setName('')
-            setUserEmail('')
-            setUserPassword('')
-            toast.success('Thanks for signing up', {
-              position: "top-center",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              });
-            setTimeout(()=> {
-              navigate('/login')
-            },2000)
-      }
-      else{
-          setName('')
-          setUserEmail('')
-          setUserPassword('')
-          toast.error('Email Already Exists', {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            });
-      }
-    }
-    else{
-        
-        setName('')
-        setUserEmail('')
-        setUserPassword('')
-        toast.info('Please fill all the fields', {
+    // checking for empty input field and then duplicate email
+    if (name && userEmail && userPassword) {
+      if (!duplicateCheck()) {
+        // storing data in redux store and local storage
+        dispatch(setUserName(name));
+        dispatch(setEmail(userEmail));
+        dispatch(setPassword(userPassword));
+        dispatch(setUserData());
+        dispatch(setLocalStorage()); 
+        setName("");
+        setUserEmail("");
+        setUserPassword("");
+        toast.success("Thanks for signing up", {
           position: "top-center",
           autoClose: 2000,
           hideProgressBar: false,
@@ -111,14 +91,44 @@ export default function SignUp() {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          });
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        setName("");
+        setUserEmail("");
+        setUserPassword("");
+        toast.error("Email Already Exists", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } else {
+      setName("");
+      setUserEmail("");
+      setUserPassword("");
+      toast.info("Please fill all the fields", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
-
+    
+  // for getting data from local storage
   useEffect(() => {
     setGetData(JSON.parse(localStorage.getItem("userData")) || []);
-  })
-
+  });
 
   return (
     <ThemeProvider theme={theme}>
@@ -137,10 +147,10 @@ export default function SignUp() {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: '#52ab98' }}>
+            <Avatar sx={{ m: 1, bgcolor: "#52ab98" }}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography color='#2b6777'  component="h1" variant="h5">
+            <Typography color="#2b6777" component="h1" variant="h5">
               Sign up
             </Typography>
             <Box sx={{ mt: 3 }}>
@@ -198,7 +208,12 @@ export default function SignUp() {
                 fullWidth
                 variant="contained"
                 onClick={submitHandler}
-                sx={{ mt: 3, mb: 2,bgcolor:'#52ab98','&:hover':{bgcolor:'#2b6777'} }}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  bgcolor: "#52ab98",
+                  "&:hover": { bgcolor: "#2b6777" },
+                }}
               >
                 Sign Up
               </Button>
